@@ -1,26 +1,290 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ------------------------------------------------------------------ */
+/* Jetons de design Viva Créative                                      */
+/* ------------------------------------------------------------------ */
+@theme {
+  /* Palette d'origine (conservée) */
+  --color-viva-white: #fafafa;
+  --color-viva-black: #111111;
+  --color-viva-gold: #c5a059;
+  --color-viva-gold-light: #e8d5a7;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Nuances utilisées dans les composants */
+  --color-viva-cream: #faf9f5; /* fond des sections claires */
+  --color-viva-ink: #100f0b; /* fond des sections sombres */
+  --color-viva-gold-deep: #b18a42; /* or lisible sur fond clair */
+  --color-viva-gold-bright: #e7c27a; /* or lumineux sur fond sombre */
+  --color-viva-gold-soft: #f3ead6; /* teinte douce pour avatars et halos */
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Teintes rosées chaudes : halos et fonds doux qui accompagnent l'or */
+  --color-viva-blush: #f6e7e2;
+  --color-viva-blush-deep: #ecd0c7;
+
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --shadow-gold: 0 24px 48px -24px rgb(177 138 66 / 0.55);
+  --shadow-gold-sm: 0 12px 28px -12px rgb(177 138 66 / 0.7);
+  --shadow-soft: 0 18px 40px -22px rgb(70 50 15 / 0.35);
+
+  /* Animations réutilisables : animate-float, animate-marquee, etc. */
+  --animate-float: float-y 6s ease-in-out infinite;
+  --animate-spin-slow: spin 28s linear infinite;
+  --animate-marquee: marquee-x 40s linear infinite;
+  --animate-twinkle: twinkle 4s ease-in-out infinite;
+
+  @keyframes float-y {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  @keyframes marquee-x {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes twinkle {
+    0%,
+    100% {
+      opacity: 0.25;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.15);
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Les polices sont chargées dans layout.tsx via next/font */
+@theme inline {
+  --font-sans: var(--font-tajawal), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                                */
+/* ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    /* Les ancres ne passent plus sous l'en-tête fixe */
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    /* Barre de défilement fine et dorée */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-viva-gold) transparent;
+  }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--color-viva-cream);
+    color: var(--color-viva-black);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-kerning: normal;
+  }
+
+  img,
+  svg,
+  video {
+    max-width: 100%;
+  }
+
+  ::selection {
+    background-color: var(--color-viva-gold-deep);
+    color: #fff;
+  }
+
+  /* Anneau de focus doré par défaut (les composants peuvent le remplacer) */
+  :focus-visible {
+    outline: 2px solid var(--color-viva-gold-deep);
+    outline-offset: 3px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-viva-gold-light);
+    border-radius: 9999px;
+    border: 2px solid var(--color-viva-cream);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-viva-gold);
+  }
+
+  /* Titres : équilibre des retours à la ligne */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Champs de formulaire : pas de zoom automatique sur iOS */
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+
+  @media (min-width: 640px) {
+    input,
+    select,
+    textarea {
+      font-size: inherit;
+    }
+  }
+
+  /* Remplissage automatique du navigateur : reste dans la palette */
+  input:-webkit-autofill,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--color-viva-black);
+    box-shadow: 0 0 0 1000px var(--color-viva-gold-soft) inset;
+    transition: background-color 9999s ease-out;
+  }
+
+  ::placeholder {
+    color: rgb(111 106 95 / 0.7);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Utilitaires                                                         */
+/* ------------------------------------------------------------------ */
+
+/* Texte en dégradé doré : <span class="text-gold-gradient"> */
+@utility text-gold-gradient {
+  background-image: linear-gradient(
+    120deg,
+    var(--color-viva-gold-deep),
+    var(--color-viva-gold-bright) 50%,
+    var(--color-viva-gold-deep)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Fond en dégradé doré : <a class="bg-gold-gradient"> */
+@utility bg-gold-gradient {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-viva-gold-deep),
+    #d4b169
+  );
+}
+
+/* Dégradé doré riche (boutons principaux) */
+@utility bg-gold-rich {
+  background-image: linear-gradient(
+    90deg,
+    #c49a50,
+    var(--color-viva-gold-deep) 50%,
+    #9a783d
+  );
+}
+
+/* Motif de points discret pour les arrière-plans */
+@utility bg-dots {
+  background-image: radial-gradient(#d9c9a3 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Grain de papier très léger : à poser en overlay (opacity 5–8 %) */
+@utility bg-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Verre dépoli clair et sombre */
+@utility glass {
+  background-color: rgb(255 255 255 / 0.65);
+  border: 1px solid rgb(255 255 255 / 0.6);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+@utility glass-dark {
+  background-color: rgb(16 15 11 / 0.45);
+  border: 1px solid rgb(255 255 255 / 0.18);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+/* Filet doré qui s'estompe sur les côtés : <div class="gold-rule"> */
+@utility gold-rule {
+  height: 1px;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-viva-gold-deep),
+    transparent
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Arabe : typographie adaptée (hors @layer pour primer sur Tailwind)  */
+/* ------------------------------------------------------------------ */
+
+/* Playfair n'a pas de glyphes arabes : on bascule sur Tajawal */
+html[lang="ar"] .font-serif {
+  font-family: var(--font-tajawal), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+}
+
+/* L'italique n'existe pas en écriture arabe */
+html[lang="ar"] .italic {
+  font-style: normal;
+}
+
+/* L'espacement entre lettres coupe les liaisons arabes */
+html[lang="ar"] * {
+  letter-spacing: 0 !important;
+}
+
+/* ------------------------------------------------------------------ */
+/* Accessibilité : respect de « réduire les animations »               */
+/* ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Impression                                                          */
+/* ------------------------------------------------------------------ */
+@media print {
+  header,
+  [aria-hidden="true"] {
+    display: none !important;
+  }
 }
