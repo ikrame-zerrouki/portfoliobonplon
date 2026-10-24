@@ -632,7 +632,12 @@ function ContactSection() {
 /* -------------------------------------------------------------------------- */
 
 function Footer() {
-  const year = new Date().getFullYear();
+  // La date est lue après le montage pour éviter une erreur de pré-rendu Next.js.
+  const [year, setYear] = useState<number | null>(null);
+
+  useEffect(() => {
+    setYear(new Date().getFullYear());
+  }, []);
 
   return (
     <footer className="relative overflow-hidden bg-[#15140f] text-white">
@@ -648,7 +653,7 @@ function Footer() {
         {/* Copyright et retour en haut */}
         <div className="flex flex-col items-center justify-between gap-3 border-t border-white/10 py-5 sm:flex-row">
           <p className="text-center text-xs text-white/50">
-            © {year} {SITE_NAME}. Tous droits réservés.
+            © {year ?? ""} {SITE_NAME}. Tous droits réservés.
           </p>
 
           <Link
